@@ -66,8 +66,8 @@ p { max-width: 62ch; }
 .site-header nav { display: flex; gap: 20px; flex-wrap: wrap; }
 .site-header nav a:hover { color: var(--wine); }
 .site-header nav { align-items: center; }
-.lang { display: inline-flex; border: 1px solid var(--line); border-radius: 999px; overflow: hidden; }
-.lang > * { padding: 5px 10px; }
+.lang { display: inline-flex; gap: 4px; padding: 3px; margin-left: 8px; border: 1px solid var(--line); border-radius: 999px; }
+.lang > * { padding: 7px 14px; border-radius: 999px; text-decoration: none; transition: background .2s, color .2s; }
 .lang [aria-current] { background: var(--ink); color: var(--paper); }
 .lang a:hover { background: var(--sand); color: var(--ink); }
 @media (max-width: 560px) { .site-header nav { gap: 12px; font-size: 11px; } }
