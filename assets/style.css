@@ -240,6 +240,8 @@ section.block { padding-block: clamp(56px, 9vw, 120px); border-bottom: 1px solid
 
 /* Feed hover + lightbox */
 .feed figure { cursor: zoom-in; }
+.feed figure:focus { outline: none; }
+.feed figure:focus-visible { outline: 2px solid var(--wine); outline-offset: 3px; }
 .feed figure img, .feed figure video { transition: transform .6s cubic-bezier(.2, .8, .2, 1), filter .4s; }
 .feed figure:hover img, .feed figure:hover video { transform: scale(1.06); }
 .feed:hover figure:not(:hover) img, .feed:hover figure:not(:hover) video { filter: saturate(.6) brightness(.85); }
