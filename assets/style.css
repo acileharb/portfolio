@@ -225,14 +225,6 @@ section.block { padding-block: clamp(56px, 9vw, 120px); border-bottom: 1px solid
 .work-item:hover .go { gap: 16px; color: var(--wine); }
 .work { isolation: isolate; }
 
-.float-preview { position: fixed; top: 0; left: 0; width: 280px; aspect-ratio: 4 / 5; pointer-events: none; z-index: 40; opacity: 0; scale: .85; transition: opacity .25s, scale .35s cubic-bezier(.2, .8, .2, 1); }
-.float-preview img { width: 100%; height: 100%; object-fit: cover; box-shadow: 0 30px 60px -30px rgba(36, 26, 24, .6); }
-.float-preview.on { opacity: 1; scale: 1; }
-@media (min-width: 761px) {
-  .has-float .work-item { grid-template-columns: 64px minmax(0, 1fr); }
-  .has-float .work-item .cover { display: none; }
-  .has-float .work-item:hover { padding-inline: 20px; }
-}
 
 /* Result chips */
 .result .ranks { display: flex; flex-wrap: wrap; gap: 6px; }

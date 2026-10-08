@@ -77,29 +77,6 @@
     });
   }));
 
-  /* Work list: floating preview that follows the cursor (desktop) */
-  const float = document.querySelector('.float-preview');
-  if (float && finePointer && !reduce) {
-    document.documentElement.classList.add('has-float');
-    const img = float.querySelector('img');
-    let x = 0, y = 0, cx = 0, cy = 0, raf;
-    const loop = () => {
-      cx += (x - cx) * .14; cy += (y - cy) * .14;
-      float.style.transform = `translate(${cx}px, ${cy}px) translate(-50%, -50%) rotate(${(x - cx) * .03}deg)`;
-      raf = requestAnimationFrame(loop);
-    };
-    items.forEach(it => {
-      it.addEventListener('mouseenter', e => {
-        img.src = it.querySelector('.cover img').src;
-        x = cx = e.clientX; y = cy = e.clientY;
-        float.classList.add('on');
-        cancelAnimationFrame(raf); loop();
-      });
-      it.addEventListener('mousemove', e => { x = e.clientX; y = e.clientY; });
-      it.addEventListener('mouseleave', () => { float.classList.remove('on'); cancelAnimationFrame(raf); });
-    });
-  }
-
   /* Magnetic buttons (desktop) */
   if (finePointer && !reduce) {
     document.querySelectorAll('.btn').forEach(b => {
