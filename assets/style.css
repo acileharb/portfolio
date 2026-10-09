@@ -72,6 +72,7 @@ p { max-width: 62ch; }
   background: var(--wine); color: var(--wine-ink) !important; transition: background .2s, transform .2s;
 }
 .nav-cta:hover { background: var(--ink); transform: translateY(-1px); }
+.pillars .btn-cta { margin-top: 10px; padding: 11px 18px; font-size: 11px; letter-spacing: .12em; white-space: nowrap; justify-self: start; }
 .hero-ctas { display: flex; flex-wrap: wrap; gap: 12px; }
 .btn-solid { background: var(--wine-ink); color: var(--wine); border-color: var(--wine-ink); }
 .hero .btn-solid:hover { background: transparent; color: var(--wine-ink); }
