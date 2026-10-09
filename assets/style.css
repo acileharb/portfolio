@@ -275,3 +275,7 @@ section.block { padding-block: clamp(56px, 9vw, 120px); border-bottom: 1px solid
   html { scroll-behavior: auto; }
   * { transition: none !important; }
 }
+
+/* Free visibility check link in the services grid */
+.btn-cta { margin-top: 18px; }
+.btn-cta:hover { background: var(--ink); color: var(--paper); border-color: var(--ink); }

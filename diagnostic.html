@@ -1,0 +1,598 @@
+<title>Restaurant Visibility Score</title>
+<link rel="alternate" hreflang="fr" href="https://acileharb.github.io/portfolio/fr/diagnostic.html">
+<meta name="description" content="Score de visibilité gratuit pour restaurants : Google Maps, Google, IA et Instagram, par Acile Harb.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=DM+Sans:opsz,wght@9..40,400;9..40,500&family=DM+Mono:wght@400;500&display=swap">
+<link rel="stylesheet" href="https://api.fontshare.com/v2/css?f[]=satoshi@400,500&display=swap">
+<style>
+/* Layout: wine hero band over paper ground, one-column stepper; results printed as a restaurant bill. */
+:root {
+  --paper: #F6F0E8;
+  --sand: #E9DDCF;
+  --ink: #241A18;
+  --ink-soft: #5E4E49;
+  --wine: #641B26;
+  --wine-ink: #F6F0E8;
+  --line: rgba(36, 26, 24, .18);
+  --bill: #FFFCF7;
+  --good: #2F6B45;
+  --warn: #9A5B12;
+  --bad: #A3313F;
+  --display: "DM Serif Display", Georgia, "Times New Roman", serif;
+  --body: "Satoshi", "DM Sans", "Helvetica Neue", Arial, sans-serif;
+  --mono: "DM Mono", ui-monospace, "SFMono-Regular", Menlo, monospace;
+  --max: 1080px;
+  --gutter: clamp(16px, 4vw, 48px);
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --paper: #1C1413; --sand: #2A1F1D; --ink: #F1E8DE; --ink-soft: #BFAFA6;
+    --wine: #7A2532; --wine-ink: #F6F0E8; --line: rgba(241, 232, 222, .18);
+    --bill: #241A18; --good: #7BC495; --warn: #E2A75A; --bad: #EE8A95;
+    color-scheme: dark;
+  }
+}
+:root[data-theme="dark"] {
+  --paper: #1C1413; --sand: #2A1F1D; --ink: #F1E8DE; --ink-soft: #BFAFA6;
+  --wine: #7A2532; --wine-ink: #F6F0E8; --line: rgba(241, 232, 222, .18);
+  --bill: #241A18; --good: #7BC495; --warn: #E2A75A; --bad: #EE8A95;
+  color-scheme: dark;
+}
+
+* { box-sizing: border-box; }
+body { margin: 0; background: var(--paper); color: var(--ink); font: 400 17px/1.6 var(--body); -webkit-font-smoothing: antialiased; }
+a { color: inherit; }
+a:focus-visible, button:focus-visible, input:focus-visible { outline: 2px solid var(--wine); outline-offset: 3px; }
+@media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) a:focus-visible, :root:not([data-theme="light"]) button:focus-visible { outline-color: var(--ink); } }
+.wrap { max-width: var(--max); margin: 0 auto; padding-inline: var(--gutter); }
+.label { font: 500 12px/1.4 var(--body); letter-spacing: .14em; text-transform: uppercase; }
+.muted { color: var(--ink-soft); }
+h1, h2, h3 { font-family: var(--display); font-weight: 400; margin: 0; text-wrap: balance; }
+p { margin: 0; max-width: 62ch; }
+
+/* Header */
+.bar { border-bottom: 1px solid rgba(246,240,232,.25); background: var(--wine); color: var(--wine-ink); }
+.bar .wrap { display: flex; justify-content: space-between; align-items: center; gap: 16px; padding-block: 16px; }
+.brand { font: 400 22px/1 var(--display); text-decoration: none; }
+.lang { display: inline-flex; gap: 4px; padding: 3px; border: 1px solid rgba(246,240,232,.4); border-radius: 999px; }
+.lang button { font: 500 12px/1 var(--body); letter-spacing: .1em; padding: 8px 14px; border-radius: 999px; border: 0; background: none; color: inherit; cursor: pointer; }
+.lang button[aria-pressed="true"] { background: var(--wine-ink); color: var(--wine); }
+
+/* Hero */
+.hero { background: var(--wine); color: var(--wine-ink); }
+.hero .wrap { padding-block: clamp(36px, 7vw, 88px) clamp(32px, 5vw, 64px); display: grid; gap: 20px; }
+.hero h1 { font-size: clamp(44px, 8.5vw, 112px); line-height: .98; text-transform: uppercase; max-width: 14ch; }
+.hero h1 em { font-style: italic; text-transform: none; }
+.hero p { font: 400 clamp(19px, 2.2vw, 26px)/1.35 var(--display); max-width: 36ch; opacity: .92; }
+.pillars { display: flex; flex-wrap: wrap; gap: 8px; }
+.pillars span { border: 1px solid rgba(246,240,232,.4); border-radius: 999px; padding: 6px 12px; }
+
+main { padding-block: clamp(32px, 6vw, 72px); }
+
+/* Steps */
+.progress { display: grid; grid-template-columns: repeat(5, 1fr); gap: 6px; margin-bottom: 28px; }
+.progress i { height: 3px; background: var(--line); border-radius: 2px; }
+.progress i.on { background: var(--wine); }
+@media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) .progress i.on { background: var(--ink); } }
+:root[data-theme="dark"] .progress i.on { background: var(--ink); }
+.step-head { display: grid; gap: 10px; margin-bottom: 28px; }
+.step-head h2 { font-size: clamp(34px, 5vw, 60px); line-height: 1.02; text-transform: uppercase; }
+
+.intro { display: grid; grid-template-columns: minmax(0, 1.1fr) minmax(0, .9fr); gap: clamp(28px, 5vw, 64px); align-items: start; }
+@media (max-width: 820px) { .intro { grid-template-columns: 1fr; } }
+.fields { display: grid; gap: 18px; }
+.field { display: grid; gap: 6px; }
+.field label { font-weight: 500; }
+.field .hint { font-size: 14px; }
+input[type="text"], input[type="email"], input[type="tel"] {
+  font: 400 17px/1.4 var(--body); color: var(--ink); background: transparent;
+  border: 0; border-bottom: 1px solid var(--ink-soft); padding: 10px 2px; width: 100%; border-radius: 0;
+}
+input::placeholder { color: var(--ink-soft); opacity: .7; }
+input[type="text"]:focus, input[type="email"]:focus, input[type="tel"]:focus { outline: none; border-bottom: 2px solid var(--wine); padding-bottom: 9px; }
+
+.q { border: 0; margin: 0; padding: 22px 0; border-top: 1px solid var(--line); display: grid; gap: 14px; min-width: 0; }
+.q legend { padding: 0; font: 400 clamp(20px, 2.2vw, 25px)/1.3 var(--display); margin-bottom: 14px; max-width: 46ch; }
+.opts { display: flex; flex-wrap: wrap; gap: 8px; }
+.opt { position: relative; }
+.opt input { position: absolute; opacity: 0; inset: 0; margin: 0; cursor: pointer; }
+.opt span { display: inline-block; padding: 10px 16px; border: 1px solid var(--line); border-radius: 999px; cursor: pointer; transition: background .15s, border-color .15s, color .15s; }
+.opt:hover span { border-color: var(--ink-soft); }
+.opt input:checked + span { background: var(--ink); color: var(--paper); border-color: var(--ink); }
+.opt input:focus-visible + span { outline: 2px solid var(--wine); outline-offset: 3px; }
+
+.helper { display: flex; flex-wrap: wrap; gap: 10px 16px; align-items: center; background: var(--sand); padding: 16px 18px; border-radius: 2px; margin-bottom: 8px; }
+.helper code { font: 400 14px/1.4 var(--mono); }
+.helper a { font-weight: 500; }
+
+.nav { display: flex; justify-content: space-between; align-items: center; gap: 16px; flex-wrap: wrap; margin-top: 28px; }
+.btn { font: 500 12px/1 var(--body); letter-spacing: .14em; text-transform: uppercase; padding: 16px 24px; border-radius: 999px; cursor: pointer; border: 1px solid var(--ink); background: var(--ink); color: var(--paper); text-decoration: none; display: inline-block; }
+.btn:hover { background: var(--wine); border-color: var(--wine); color: var(--wine-ink); }
+.btn.ghost { background: none; color: var(--ink); border-color: var(--line); }
+.btn.ghost:hover { border-color: var(--ink); color: var(--ink); background: none; }
+.btn.small { padding: 10px 14px; }
+.err { color: var(--bad); font-size: 15px; }
+
+/* The bill */
+.bill { background: var(--bill); color: var(--ink); font: 400 15px/1.5 var(--mono); padding: 26px 24px 30px; border: 1px solid var(--line); box-shadow: 0 18px 40px -24px rgba(36,26,24,.35); position: relative; font-variant-numeric: tabular-nums; }
+.bill::after { content: ""; position: absolute; left: 0; right: 0; bottom: -9px; height: 10px; background: radial-gradient(circle at 6px 0, transparent 5px, var(--bill) 5.5px) 0 0 / 12px 10px repeat-x; }
+.bill .tag-ex { display: inline-block; font: 500 11px/1 var(--body); letter-spacing: .14em; text-transform: uppercase; padding: 5px 8px; border: 1px dashed var(--ink-soft); color: var(--ink-soft); margin-bottom: 14px; }
+.bill .bh { text-align: center; display: grid; gap: 2px; padding-bottom: 14px; border-bottom: 1px dashed var(--ink-soft); }
+.bill .bh strong { font: 400 24px/1.15 var(--display); }
+.bill .row { display: flex; justify-content: space-between; gap: 12px; padding: 8px 0; }
+.bill .row .meter { display: block; height: 4px; background: var(--sand); margin-top: 6px; border-radius: 2px; overflow: hidden; }
+.bill .row .meter b { display: block; height: 100%; border-radius: 2px; }
+.bill .lines { padding-block: 10px; border-bottom: 1px dashed var(--ink-soft); }
+.bill .total { display: flex; justify-content: space-between; align-items: baseline; padding-top: 14px; }
+.bill .total .n { font: 400 54px/1 var(--display); }
+.bill .total .n small { font: 400 20px/1 var(--mono); color: var(--ink-soft); }
+.bill .foot { text-align: center; color: var(--ink-soft); margin-top: 14px; font-size: 13px; }
+.c-good { background: var(--good); } .c-warn { background: var(--warn); } .c-bad { background: var(--bad); }
+.t-good { color: var(--good); } .t-warn { color: var(--warn); } .t-bad { color: var(--bad); }
+
+/* Results */
+.results { display: grid; grid-template-columns: minmax(0, .85fr) minmax(0, 1.15fr); gap: clamp(28px, 5vw, 64px); align-items: start; }
+@media (max-width: 860px) { .results { grid-template-columns: 1fr; } }
+.verdict { display: grid; gap: 12px; margin-bottom: 30px; }
+.verdict h2 { font-size: clamp(36px, 5vw, 62px); line-height: 1; text-transform: uppercase; }
+.wins { list-style: none; padding: 0; margin: 0; display: grid; }
+.wins li { display: grid; grid-template-columns: auto minmax(0,1fr); gap: 6px 16px; padding: 18px 0; border-top: 1px solid var(--line); }
+.wins .num { font: 400 30px/1 var(--display); color: var(--wine); grid-row: span 2; min-width: 1.2em; }
+@media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) .wins .num { color: var(--ink-soft); } }
+:root[data-theme="dark"] .wins .num { color: var(--ink-soft); }
+.wins h3 { font-size: 21px; line-height: 1.25; }
+.wins .gain { font-size: 13px; }
+
+.lead { margin-top: 40px; background: var(--wine); color: var(--wine-ink); padding: clamp(24px, 4vw, 40px); border-radius: 2px; display: grid; gap: 18px; }
+.lead h2 { font-size: clamp(28px, 3.6vw, 42px); line-height: 1.05; }
+.lead p { opacity: .92; }
+.lead .fields { grid-template-columns: 1fr 1fr; }
+@media (max-width: 560px) { .lead .fields { grid-template-columns: 1fr; } }
+.lead .field.full { grid-column: 1 / -1; }
+.lead input[type="text"], .lead input[type="email"], .lead input[type="tel"] { color: var(--wine-ink); border-bottom-color: rgba(246,240,232,.55); }
+.lead input::placeholder { color: rgba(246,240,232,.7); }
+.lead input:focus { border-bottom-color: var(--wine-ink) !important; }
+.consent { display: flex; gap: 10px; align-items: flex-start; font-size: 14px; line-height: 1.45; }
+.consent input { margin-top: 3px; accent-color: var(--wine-ink); width: 18px; height: 18px; flex: none; }
+.lead .btn { background: var(--wine-ink); color: var(--wine); border-color: var(--wine-ink); justify-self: start; }
+.lead .btn:hover { background: transparent; color: var(--wine-ink); }
+.lead .btn.ghost { background: none; color: var(--wine-ink); border-color: rgba(246,240,232,.5); }
+.lead .err { color: #FFD3D8; }
+.mailbox { display: grid; gap: 12px; }
+.mailbox code { font: 400 15px/1.4 var(--mono); background: rgba(0,0,0,.18); padding: 8px 12px; border-radius: 2px; word-break: break-all; }
+.row-btns { display: flex; flex-wrap: wrap; gap: 10px; }
+.hp { position: absolute; left: -9999px; width: 1px; height: 1px; overflow: hidden; }
+
+footer { border-top: 1px solid var(--line); }
+footer .wrap { padding-block: 24px; display: flex; justify-content: space-between; flex-wrap: wrap; gap: 12px; font-size: 14px; }
+
+@media (prefers-reduced-motion: no-preference) {
+  .screen { animation: rise .35s ease-out both; }
+  @keyframes rise { from { opacity: .4; transform: translateY(8px); } to { opacity: 1; transform: none; } }
+  .bill .meter b { transition: width .6s ease-out; }
+}
+</style>
+
+<header class="bar">
+  <div class="wrap">
+    <a class="brand" href="index.html">Acile Harb</a>
+    <div class="lang" role="group" aria-label="Language">
+      <button type="button" id="lang-fr" data-lang="fr">FR</button>
+      <button type="button" id="lang-en" data-lang="en">EN</button>
+    </div>
+  </div>
+</header>
+
+<section class="hero">
+  <div class="wrap">
+    <span class="label" id="h-eyebrow"></span>
+    <h1 id="h-title"></h1>
+    <p id="h-lede"></p>
+    <div class="pillars label"><span>Google Maps</span><span id="h-p2"></span><span id="h-p3"></span><span>Instagram</span></div>
+  </div>
+</section>
+
+<main class="wrap">
+  <div id="app" aria-live="polite"></div>
+</main>
+
+<footer>
+  <div class="wrap muted">
+    <span id="f-left"></span>
+    <a href="https://acileharb.github.io/portfolio/" target="_blank" rel="noopener">acileharb.github.io/portfolio ↗</a>
+  </div>
+</footer>
+
+<script>
+/* ===== Settings: change these two lines ===== */
+// Paste your Formspree endpoint (https://formspree.io/f/xxxxxx) to receive every lead by email automatically.
+// Left empty, visitors are asked to email you their summary instead.
+const FORM_ENDPOINT = "";
+const CONTACT_EMAIL = "acileharb9@gmail.com";
+// Language the page opens in ("fr" or "en"). Visitors can still switch with the FR/EN buttons.
+const DEFAULT_LANG = "en";
+/* ============================================ */
+
+const PILLARS = [
+  { id: "maps", name: { fr: "Google Maps", en: "Google Maps" },
+    desc: { fr: "Ce que voient les gens qui cherchent « restaurant près de moi ».", en: "What people see when they search “restaurant near me”." },
+    qs: [
+      { id: "m1", q: { fr: "Votre fiche Google est-elle revendiquée et complète (horaires, menu, photos, catégorie) ?", en: "Is your Google Business Profile claimed and complete (hours, menu, photos, category)?" },
+        o: [["Oui, tout est à jour", "Yes, all up to date", 9], ["Revendiquée mais incomplète", "Claimed but incomplete", 5], ["Je ne sais pas qui la gère", "Not sure who manages it", 2], ["Non / je ne sais pas", "No / I don't know", 0]],
+        fix: { fr: ["Complétez votre fiche Google", "Horaires (jours fériés compris), menu, catégorie principale précise et une vingtaine de photos récentes. C'est le levier le plus rapide pour remonter sur Maps."],
+               en: ["Complete your Google profile", "Hours (holidays included), menu, a precise main category and around twenty recent photos. It's the fastest lever to climb on Maps."] } },
+      { id: "m2", q: { fr: "Combien d'avis Google avez-vous ?", en: "How many Google reviews do you have?" },
+        o: [["Moins de 50", "Under 50", 1], ["50 à 199", "50 to 199", 4], ["200 à 499", "200 to 499", 6], ["500 ou plus", "500 or more", 8]],
+        fix: { fr: ["Collectez des avis chaque semaine", "Un QR code sur l'addition et une phrase de l'équipe en fin de repas. Visez une dizaine de nouveaux avis par mois."],
+               en: ["Collect reviews every week", "A QR code on the bill and a line from staff at the end of the meal. Aim for about ten new reviews a month."] } },
+      { id: "m3", q: { fr: "Répondez-vous aux avis, positifs comme négatifs ?", en: "Do you reply to reviews, good and bad?" },
+        o: [["Toujours, sous 48 h", "Always, within 48 h", 8], ["Parfois", "Sometimes", 4], ["Rarement ou jamais", "Rarely or never", 0]],
+        fix: { fr: ["Répondez à chaque avis sous 48 h", "Citez un plat ou un détail du repas. Google en tient compte, et les futurs clients lisent vos réponses."],
+               en: ["Reply to every review within 48 h", "Mention a dish or a detail from the meal. Google takes it into account, and future guests read your replies."] } }
+    ] },
+  { id: "search", name: { fr: "Recherche Google", en: "Google Search" },
+    desc: { fr: "Ce qui apparaît quand on cherche votre cuisine dans votre ville.", en: "What shows up when people search your cuisine in your city." },
+    qs: [
+      { id: "s1", q: { fr: "Avez-vous un site avec votre menu en texte (pas seulement un PDF ou une photo) ?", en: "Do you have a website with your menu as text (not only a PDF or photo)?" },
+        o: [["Oui, menu en texte", "Yes, menu as text", 9], ["Oui, menu en PDF ou image", "Yes, menu as PDF or image", 5], ["Juste TheFork ou les réseaux", "Only TheFork or social media", 2], ["Pas de site", "No website", 0]],
+        fix: { fr: ["Mettez votre menu en texte sur votre site", "Google et les IA lisent mal les PDF et les photos de carte. Le nom des plats en texte vous fait apparaître sur ces recherches."],
+               en: ["Put your menu on your site as text", "Google and AI tools read PDFs and menu photos poorly. Dish names as text help you show up for those searches."] } },
+      { id: "s2", q: { fr: "Quand vous cherchez « {cuisine} {city} » sur Google, où apparaissez-vous ?", en: "When you search “{cuisine} {city}” on Google, where do you appear?" },
+        o: [["Dans les 3 premiers sur la carte", "Top 3 on the map", 9], ["Sur la première page", "On the first page", 6], ["Plus loin", "Further down", 2], ["Je ne me trouve pas", "I can't find myself", 0]],
+        fix: { fr: ["Visez les mots que tapent vos clients", "Utilisez « {cuisine} {city} » et ses variantes dans votre fiche Google et sur votre site : titres, descriptions, catégories."],
+               en: ["Target the words your guests type", "Use “{cuisine} {city}” and its variants in your Google profile and on your site: titles, descriptions, categories."] } },
+      { id: "s3", q: { fr: "Nom, adresse et téléphone sont-ils identiques partout (Google, TheFork, Tripadvisor, PagesJaunes, site) ?", en: "Are your name, address and phone identical everywhere (Google, TheFork, Tripadvisor, Yelp, website)?" },
+        o: [["Oui, partout", "Yes, everywhere", 7], ["Je pense, sans avoir vérifié", "I think so, never checked", 3], ["Non, il y a des différences", "No, there are differences", 0]],
+        fix: { fr: ["Harmonisez vos informations partout", "Un même nom, une même adresse et un même numéro sur chaque plateforme. Les incohérences font perdre confiance à Google."],
+               en: ["Make your details match everywhere", "Same name, address and number on every platform. Inconsistencies make Google trust your listing less."] } }
+    ] },
+  { id: "ai", name: { fr: "Recherche IA", en: "AI search" },
+    desc: { fr: "Ce que répondent ChatGPT, Gemini ou Perplexity quand on leur demande une adresse.", en: "What ChatGPT, Gemini or Perplexity answer when someone asks for a place to eat." },
+    qs: [
+      { id: "a1", q: { fr: "Quand on demande à ChatGPT les meilleurs restaurants {cuisine} à {city}, êtes-vous cité ?", en: "When someone asks ChatGPT for the best {cuisine} restaurants in {city}, are you mentioned?" },
+        o: [["Oui, à chaque fois", "Yes, every time", 10], ["Parfois", "Sometimes", 5], ["Non", "No", 0], ["Je n'ai jamais vérifié", "Never checked", 0]],
+        fix: { fr: ["Donnez aux IA de quoi vous recommander", "Elles citent les restaurants décrits clairement en ligne : descriptions précises, avis détaillés, mentions dans des guides."],
+               en: ["Give AI tools a reason to recommend you", "They cite restaurants that are clearly described online: precise descriptions, detailed reviews, mentions in guides."] } },
+      { id: "a2", q: { fr: "Votre site décrit-il clairement votre cuisine, vos spécialités et votre quartier ?", en: "Does your website clearly describe your cuisine, specialties and neighborhood?" },
+        o: [["Oui, en détail", "Yes, in detail", 8], ["Un peu", "A little", 4], ["Non, ou pas de site", "No, or no website", 0]],
+        fix: { fr: ["Écrivez votre page « À propos »", "Le quartier, le type de cuisine, vos plats signatures et ce qui vous distingue. C'est ce texte que les IA reprennent."],
+               en: ["Write your About page", "Neighborhood, type of cuisine, signature dishes and what sets you apart. This is the text AI tools repeat."] } },
+      { id: "a3", q: { fr: "Êtes-vous mentionné dans des guides, articles ou blogs (presse locale, Le Fooding, créateurs food) ?", en: "Are you mentioned in guides, articles or blogs (local press, food guides, creators)?" },
+        o: [["Oui, plusieurs fois", "Yes, several times", 7], ["Une ou deux fois", "Once or twice", 4], ["Non", "No", 0]],
+        fix: { fr: ["Obtenez 2 ou 3 mentions extérieures", "Presse locale, guides, créateurs food. Chaque mention renforce votre crédibilité auprès de Google et des IA."],
+               en: ["Earn 2 or 3 outside mentions", "Local press, guides, food creators. Each mention builds your credibility with Google and AI tools."] } }
+    ] },
+  { id: "insta", name: { fr: "Instagram", en: "Instagram" },
+    desc: { fr: "Là où les clients décident s'ils ont envie de venir.", en: "Where guests decide whether they want to come." },
+    qs: [
+      { id: "i1", q: { fr: "À quelle fréquence publiez-vous ?", en: "How often do you post?" },
+        o: [["3 fois par semaine ou plus", "3+ times a week", 9], ["1 à 2 fois par semaine", "1–2 times a week", 6], ["Quelques fois par mois", "A few times a month", 3], ["Rarement", "Rarely", 0]],
+        fix: { fr: ["Publiez au moins 2 fois par semaine", "Un plan simple : un plat, une coulisse, un moment en salle. La régularité compte plus que la perfection."],
+               en: ["Post at least twice a week", "A simple plan: a dish, a behind-the-scenes, a moment in the dining room. Consistency beats perfection."] } },
+      { id: "i2", q: { fr: "Avez-vous publié des Reels ce mois-ci ?", en: "Have you posted Reels this month?" },
+        o: [["Oui, plusieurs", "Yes, several", 8], ["Un seul", "Just one", 4], ["Aucun", "None", 0]],
+        fix: { fr: ["Publiez un Reel par semaine", "C'est le format qui touche les gens qui ne vous suivent pas encore : le plat qui sort de la cuisine, un geste du chef."],
+               en: ["Post one Reel a week", "It's the format that reaches people who don't follow you yet: a dish leaving the kitchen, a chef's gesture."] } },
+      { id: "i3", q: { fr: "Votre bio contient-elle l'adresse, les horaires et un lien pour réserver ?", en: "Does your bio include your address, hours and a booking link?" },
+        o: [["Oui, les trois", "Yes, all three", 8], ["En partie", "Partly", 4], ["Non", "No", 0]],
+        fix: { fr: ["Complétez votre bio Instagram", "Adresse, horaires et lien direct de réservation. Une personne qui hésite doit pouvoir réserver en un clic."],
+               en: ["Complete your Instagram bio", "Address, hours and a direct booking link. Someone who's hesitating should be able to book in one tap."] } }
+    ] }
+];
+
+const T = {
+  fr: {
+    eyebrow: "Diagnostic gratuit · 3 minutes",
+    title: "Votre restaurant est-il <em>facile</em> à trouver ?",
+    lede: "Répondez à 12 questions et obtenez votre score de visibilité sur 100, avec les 3 actions qui vous rapporteront le plus de clients.",
+    p2: "Recherche Google", p3: "Recherche IA",
+    footer: "Diagnostic indicatif basé sur vos réponses.",
+    step: (n) => `Étape ${n} sur 5`,
+    startTitle: "Parlez-moi de votre restaurant",
+    startSub: "Ces infos servent à personnaliser les questions et les liens de vérification.",
+    fName: "Nom du restaurant", fNamePh: "Ex. Le Petit Comptoir",
+    fCity: "Ville", fCityPh: "Ex. Versailles",
+    fCuisine: "Type de cuisine", fCuisinePh: "Ex. italien, brunch, libanais",
+    fCuisineHint: "Le mot qu'un client taperait sur Google.",
+    start: "Commencer le diagnostic",
+    needInfo: "Indiquez le nom du restaurant et la ville pour continuer.",
+    needAll: "Répondez aux 3 questions pour continuer.",
+    next: "Suivant", back: "Retour", seeScore: "Voir mon score",
+    checkMaps: (n) => `Voir ${n} sur Google Maps ↗`,
+    checkSearch: (q) => `Chercher « ${q} » sur Google ↗`,
+    testAI: "Testez maintenant, copiez cette question :",
+    askAI: "Demander à ChatGPT ↗",
+    aiPrompt: (c, v) => `Quels sont les meilleurs restaurants ${c} à ${v} ?`,
+    copy: "Copier", copied: "Copié",
+    defaultCuisine: "restaurant",
+    sample: "Exemple", sampleName: "Bistro du Marché", sampleCity: "Saint-Germain-en-Laye",
+    billTable: "Table 1 · Diagnostic visibilité",
+    total: "Total",
+    thanks: "Merci et à bientôt",
+    yourScore: "Votre score",
+    bands: [
+      [0, "Presque invisible", "Les clients qui ne vous connaissent pas encore ont du mal à vous trouver. La bonne nouvelle : les premiers gains arrivent vite."],
+      [40, "Difficile à trouver", "Vos habitués vous connaissent, mais les nouveaux clients passent souvent devant vous sans vous voir en ligne."],
+      [60, "Bien placé, avec de la marge", "Les bases sont là. Quelques réglages ciblés peuvent vous faire passer devant vos concurrents."],
+      [80, "Très visible", "Vous faites partie des restaurants qu'on trouve facilement. L'enjeu maintenant : garder cette avance."]
+    ],
+    winsTitle: "Vos 3 priorités",
+    gain: (p, n) => `Jusqu'à +${p} points · ${n}`,
+    leadTitle: "Recevez votre plan d'action détaillé",
+    leadText: "J'analyse votre fiche Google, votre site et votre Instagram, et je vous envoie un plan en 3 priorités sous 48 h. Gratuit, sans engagement.",
+    lFirst: "Prénom", lEmail: "Email", lPhone: "Téléphone / WhatsApp (facultatif)",
+    consent: "J'accepte qu'Acile Harb me recontacte au sujet de ce diagnostic. Mes données ne sont ni revendues ni partagées.",
+    send: "Recevoir mon plan", sending: "Envoi…",
+    leadErr: "Indiquez votre prénom, un email valide et cochez la case pour continuer.",
+    sentTitle: (n) => `C'est noté, ${n}.`,
+    sentText: "Vous recevrez votre plan d'action sous 48 h. En attendant, gardez cette page : vos 3 priorités sont juste au-dessus.",
+    mailTitle: "Dernière étape : envoyez-moi votre récapitulatif",
+    mailText: "Cliquez sur le bouton pour ouvrir votre messagerie avec le récapitulatif déjà rédigé. Si rien ne s'ouvre, copiez-le et envoyez-le à cette adresse :",
+    mailBtn: "Ouvrir mon email", copySummary: "Copier le récapitulatif", copyEmail: "Copier l'adresse",
+    subject: (n) => `Diagnostic visibilité : ${n}`,
+    restart: "Refaire le diagnostic"
+  },
+  en: {
+    eyebrow: "Free check · 3 minutes",
+    title: "Is your restaurant <em>easy</em> to find?",
+    lede: "Answer 12 questions and get your visibility score out of 100, plus the 3 actions that will bring you the most new guests.",
+    p2: "Google Search", p3: "AI search",
+    footer: "Indicative score based on your answers.",
+    step: (n) => `Step ${n} of 5`,
+    startTitle: "Tell me about your restaurant",
+    startSub: "This personalizes the questions and the links you'll use to check yourself.",
+    fName: "Restaurant name", fNamePh: "e.g. The Little Counter",
+    fCity: "City", fCityPh: "e.g. Paris",
+    fCuisine: "Type of cuisine", fCuisinePh: "e.g. Italian, brunch, Lebanese",
+    fCuisineHint: "The word a guest would type into Google.",
+    start: "Start the check",
+    needInfo: "Add the restaurant name and city to continue.",
+    needAll: "Answer all 3 questions to continue.",
+    next: "Next", back: "Back", seeScore: "See my score",
+    checkMaps: (n) => `Find ${n} on Google Maps ↗`,
+    checkSearch: (q) => `Search “${q}” on Google ↗`,
+    testAI: "Test it now, copy this question:",
+    askAI: "Ask ChatGPT ↗",
+    aiPrompt: (c, v) => `What are the best ${c} restaurants in ${v}?`,
+    copy: "Copy", copied: "Copied",
+    defaultCuisine: "restaurant",
+    sample: "Example", sampleName: "Bistro du Marché", sampleCity: "Saint-Germain-en-Laye",
+    billTable: "Table 1 · Visibility check",
+    total: "Total",
+    thanks: "Thank you, see you soon",
+    yourScore: "Your score",
+    bands: [
+      [0, "Nearly invisible", "Guests who don't know you yet struggle to find you. The good news: the first gains come quickly."],
+      [40, "Hard to find", "Your regulars know you, but new guests often walk past you online without seeing you."],
+      [60, "Findable, with room to grow", "The basics are there. A few targeted fixes can put you ahead of nearby competitors."],
+      [80, "Highly visible", "You're one of the places people find easily. Now the job is keeping that lead."]
+    ],
+    winsTitle: "Your 3 priorities",
+    gain: (p, n) => `Up to +${p} points · ${n}`,
+    leadTitle: "Get your detailed action plan",
+    leadText: "I review your Google profile, website and Instagram, and send you a 3-priority plan within 48 h. Free, no commitment.",
+    lFirst: "First name", lEmail: "Email", lPhone: "Phone / WhatsApp (optional)",
+    consent: "I agree that Acile Harb may contact me about this check. My data is never sold or shared.",
+    send: "Get my plan", sending: "Sending…",
+    leadErr: "Add your first name, a valid email, and tick the box to continue.",
+    sentTitle: (n) => `Got it, ${n}.`,
+    sentText: "Your action plan will arrive within 48 h. Keep this page in the meantime: your 3 priorities are just above.",
+    mailTitle: "Last step: email me your summary",
+    mailText: "The button opens your email app with the summary already written. If nothing opens, copy it and send it to:",
+    mailBtn: "Open my email", copySummary: "Copy summary", copyEmail: "Copy address",
+    subject: (n) => `Visibility check: ${n}`,
+    restart: "Start over"
+  }
+};
+
+const state = { lang: "fr", step: 0, info: { name: "", city: "", cuisine: "" }, answers: {}, lead: { first: "", email: "", phone: "", ok: false }, status: "idle", error: "" };
+state.lang = DEFAULT_LANG === "en" ? "en" : "fr";
+try { const s = JSON.parse(localStorage.getItem("vis-score") || "null"); if (s && s.info) { Object.assign(state.info, s.info); Object.assign(state.answers, s.answers || {}); } } catch (e) {}
+
+const app = document.getElementById("app");
+const esc = (s) => String(s).replace(/[&<>"']/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]));
+const t = () => T[state.lang];
+const L = () => state.lang === "fr" ? 0 : 1;
+const cuisine = () => state.info.cuisine.trim() || t().defaultCuisine;
+const fill = (s) => s.replace(/\{cuisine\}/g, esc(cuisine())).replace(/\{city\}/g, esc(state.info.city.trim()));
+const fillPlain = (s) => s.replace(/\{cuisine\}/g, cuisine()).replace(/\{city\}/g, state.info.city.trim());
+function save() { try { localStorage.setItem("vis-score", JSON.stringify({ info: state.info, answers: state.answers })); } catch (e) {} }
+
+function pts(q) { const i = state.answers[q.id]; return i == null ? 0 : q.o[i][2]; }
+const maxPts = (q) => Math.max(...q.o.map((o) => o[2]));
+function scores() {
+  const per = PILLARS.map((p) => ({ p, s: p.qs.reduce((a, q) => a + pts(q), 0), m: p.qs.reduce((a, q) => a + maxPts(q), 0) }));
+  return { per, total: per.reduce((a, x) => a + x.s, 0) };
+}
+const tone = (r) => r >= .7 ? "good" : r >= .45 ? "warn" : "bad";
+function band(total) { let b = t().bands[0]; for (const x of t().bands) if (total >= x[0]) b = x; return b; }
+function wins() {
+  const all = [];
+  PILLARS.forEach((p) => p.qs.forEach((q) => all.push({ p, q, gap: maxPts(q) - pts(q) })));
+  return all.filter((x) => x.gap > 0).sort((a, b) => b.gap - a.gap).slice(0, 3);
+}
+
+function billHTML(name, city, rows, total, example) {
+  const date = new Date().toLocaleDateString(state.lang === "fr" ? "fr-FR" : "en-GB", { day: "2-digit", month: "2-digit", year: "numeric" });
+  return `<div class="bill">
+    ${example ? `<span class="tag-ex">${t().sample}</span>` : ""}
+    <div class="bh"><strong>${esc(name)}</strong><span class="muted">${esc(city)}</span><span class="muted">${t().billTable} · ${date}</span></div>
+    <div class="lines">${rows.map((r) => `<div class="row"><div style="flex:1;min-width:0">${esc(r.name)}<span class="meter"><b class="c-${tone(r.s / r.m)}" style="width:${Math.round(r.s / r.m * 100)}%"></b></span></div><span>${r.s}/${r.m}</span></div>`).join("")}</div>
+    <div class="total"><span class="label">${t().total}</span><span class="n t-${tone(total / 100)}">${total}<small> /100</small></span></div>
+    <div class="foot">${t().thanks}</div>
+  </div>`;
+}
+
+function renderChrome() {
+  document.documentElement.lang = state.lang;
+  document.getElementById("h-eyebrow").textContent = t().eyebrow;
+  document.getElementById("h-title").innerHTML = t().title;
+  document.getElementById("h-lede").textContent = t().lede;
+  document.getElementById("h-p2").textContent = t().p2;
+  document.getElementById("h-p3").textContent = t().p3;
+  document.getElementById("f-left").textContent = "© 2026 Acile Harb · " + t().footer;
+  document.querySelectorAll(".lang button").forEach((b) => b.setAttribute("aria-pressed", b.dataset.lang === state.lang ? "true" : "false"));
+}
+const progress = () => `<div class="progress" aria-hidden="true">${[0, 1, 2, 3, 4].map((i) => `<i class="${i <= state.step ? "on" : ""}"></i>`).join("")}</div>`;
+
+function renderIntro() {
+  const sampleRows = [["Google Maps", 14], [t().p2, 11], [t().p3, 4], ["Instagram", 17]].map(([n, s]) => ({ name: n, s, m: 25 }));
+  app.innerHTML = `<div class="screen">${progress()}
+  <div class="intro">
+    <form id="f-intro" class="fields" novalidate>
+      <div class="step-head"><span class="label muted">${t().step(1)}</span><h2>${t().startTitle}</h2><p class="muted">${t().startSub}</p></div>
+      <div class="field"><label for="in-name">${t().fName}</label><input id="in-name" type="text" autocomplete="organization" placeholder="${esc(t().fNamePh)}" value="${esc(state.info.name)}"></div>
+      <div class="field"><label for="in-city">${t().fCity}</label><input id="in-city" type="text" autocomplete="address-level2" placeholder="${esc(t().fCityPh)}" value="${esc(state.info.city)}"></div>
+      <div class="field"><label for="in-cuisine">${t().fCuisine}</label><input id="in-cuisine" type="text" placeholder="${esc(t().fCuisinePh)}" value="${esc(state.info.cuisine)}"><span class="hint muted">${t().fCuisineHint}</span></div>
+      <p class="err" id="intro-err" hidden></p>
+      <div class="nav"><button class="btn" type="submit">${t().start}</button></div>
+    </form>
+    <aside aria-label="${t().sample}">${billHTML(t().sampleName, t().sampleCity, sampleRows, 46, true)}</aside>
+  </div></div>`;
+  const f = document.getElementById("f-intro");
+  ["name", "city", "cuisine"].forEach((k) => document.getElementById("in-" + k).addEventListener("input", (e) => { state.info[k] = e.target.value; save(); }));
+  f.addEventListener("submit", (e) => {
+    e.preventDefault();
+    if (!state.info.name.trim() || !state.info.city.trim()) { const er = document.getElementById("intro-err"); er.textContent = t().needInfo; er.hidden = false; return; }
+    go(1);
+  });
+}
+
+function helperHTML(p) {
+  const n = state.info.name.trim(), c = state.info.city.trim();
+  if (p.id === "maps") return `<div class="helper"><a href="https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(n + " " + c)}" target="_blank" rel="noopener">${esc(t().checkMaps(n))}</a></div>`;
+  if (p.id === "search") { const q = cuisine() + " " + c; return `<div class="helper"><a href="https://www.google.com/search?q=${encodeURIComponent(q)}" target="_blank" rel="noopener">${esc(t().checkSearch(q))}</a></div>`; }
+  if (p.id === "ai") { const pr = t().aiPrompt(cuisine(), c); return `<div class="helper"><span>${t().testAI}</span><code id="ai-prompt">${esc(pr)}</code><button class="btn ghost small" type="button" id="copy-ai">${t().copy}</button><a href="https://chatgpt.com/?q=${encodeURIComponent(pr)}" target="_blank" rel="noopener">${t().askAI}</a></div>`; }
+  return "";
+}
+
+function renderPillar(idx) {
+  const p = PILLARS[idx];
+  app.innerHTML = `<div class="screen">${progress()}
+    <div class="step-head"><span class="label muted">${t().step(idx + 2)}</span><h2>${esc(p.name[state.lang])}</h2><p class="muted">${esc(p.desc[state.lang])}</p></div>
+    ${helperHTML(p)}
+    <form id="f-p" novalidate>
+      ${p.qs.map((q) => `<fieldset class="q"><legend>${fill(q.q[state.lang])}</legend><div class="opts">
+        ${q.o.map((o, i) => `<label class="opt"><input type="radio" name="${q.id}" id="${q.id}-${i}" value="${i}" ${state.answers[q.id] === i ? "checked" : ""}><span>${esc(o[L()])}</span></label>`).join("")}
+      </div></fieldset>`).join("")}
+      <p class="err" id="p-err" hidden></p>
+      <div class="nav"><button class="btn ghost" type="button" id="back">${t().back}</button><button class="btn" type="submit">${idx === 3 ? t().seeScore : t().next}</button></div>
+    </form></div>`;
+  app.querySelectorAll('input[type="radio"]').forEach((r) => r.addEventListener("change", () => { state.answers[r.name] = Number(r.value); save(); }));
+  document.getElementById("back").addEventListener("click", () => go(idx));
+  const cp = document.getElementById("copy-ai");
+  if (cp) cp.addEventListener("click", () => copyText(document.getElementById("ai-prompt").textContent, cp, document.getElementById("ai-prompt")));
+  document.getElementById("f-p").addEventListener("submit", (e) => {
+    e.preventDefault();
+    if (p.qs.some((q) => state.answers[q.id] == null)) { const er = document.getElementById("p-err"); er.textContent = t().needAll; er.hidden = false; return; }
+    go(idx + 2);
+  });
+}
+
+function summaryText() {
+  const { per, total } = scores();
+  const lines = [
+    `${state.info.name.trim()} · ${state.info.city.trim()} · ${cuisine()}`,
+    `${t().yourScore}: ${total}/100 (${band(total)[1]})`,
+    ...per.map((x) => `- ${x.p.name[state.lang]}: ${x.s}/${x.m}`),
+    "",
+    t().winsTitle + ":",
+    ...wins().map((w, i) => `${i + 1}. ${w.q.fix[state.lang][0].replace(/\{cuisine\}/g, cuisine()).replace(/\{city\}/g, state.info.city.trim())}`),
+    "",
+    ...PILLARS.flatMap((p) => p.qs.map((q) => `${fillPlain(q.q[state.lang])} → ${state.answers[q.id] != null ? q.o[state.answers[q.id]][L()] : "-"}`))
+  ];
+  if (state.lead.first) lines.unshift(`${state.lead.first} · ${state.lead.email}${state.lead.phone ? " · " + state.lead.phone : ""}`, "");
+  return lines.join("\n");
+}
+
+function leadHTML() {
+  if (state.status === "sent") return `<div class="lead"><h2>${esc(t().sentTitle(state.lead.first))}</h2><p>${t().sentText}</p></div>`;
+  if (state.status === "mail") {
+    const href = `mailto:${CONTACT_EMAIL}?subject=${encodeURIComponent(t().subject(state.info.name.trim()))}&body=${encodeURIComponent(summaryText())}`;
+    return `<div class="lead mailbox"><h2>${t().mailTitle}</h2><p>${t().mailText}</p><code id="mail-addr">${CONTACT_EMAIL}</code>
+      <div class="row-btns"><a class="btn" href="${href}">${t().mailBtn}</a><button class="btn ghost" type="button" id="copy-sum">${t().copySummary}</button><button class="btn ghost" type="button" id="copy-mail">${t().copyEmail}</button></div></div>`;
+  }
+  const l = state.lead;
+  return `<form class="lead" id="f-lead" novalidate>
+    <h2>${t().leadTitle}</h2><p>${t().leadText}</p>
+    <div class="fields">
+      <div class="field"><label for="l-first">${t().lFirst}</label><input id="l-first" type="text" autocomplete="given-name" value="${esc(l.first)}"></div>
+      <div class="field"><label for="l-email">${t().lEmail}</label><input id="l-email" type="email" autocomplete="email" value="${esc(l.email)}"></div>
+      <div class="field full"><label for="l-phone">${t().lPhone}</label><input id="l-phone" type="tel" autocomplete="tel" value="${esc(l.phone)}"></div>
+      <div class="hp" aria-hidden="true"><label for="l-hp">Website</label><input id="l-hp" type="text" tabindex="-1" autocomplete="off"></div>
+      <label class="consent field full"><input id="l-ok" type="checkbox" ${l.ok ? "checked" : ""}><span>${t().consent}</span></label>
+    </div>
+    <p class="err" id="lead-err" ${state.error ? "" : "hidden"}>${esc(state.error)}</p>
+    <button class="btn" type="submit" ${state.status === "sending" ? "disabled" : ""}>${state.status === "sending" ? t().sending : t().send}</button>
+  </form>`;
+}
+
+function renderResults() {
+  const { per, total } = scores();
+  const b = band(total);
+  const w = wins();
+  app.innerHTML = `<div class="screen">${progress()}
+  <div class="results">
+    <div>${billHTML(state.info.name.trim(), state.info.city.trim() + " · " + cuisine(), per.map((x) => ({ name: x.p.name[state.lang], s: x.s, m: x.m })), total, false)}
+      <div class="nav"><button class="btn ghost" type="button" id="restart">${t().restart}</button></div></div>
+    <div>
+      <div class="verdict"><span class="label muted">${t().yourScore} · ${total}/100</span><h2>${b[1]}</h2><p>${b[2]}</p></div>
+      <span class="label muted">${t().winsTitle}</span>
+      <ol class="wins">${w.map((x, i) => `<li><span class="num">${i + 1}</span><h3>${fill(x.q.fix[state.lang][0])}</h3><div><p class="muted">${fill(x.q.fix[state.lang][1])}</p><p class="gain label muted" style="margin-top:8px">${esc(t().gain(x.gap, x.p.name[state.lang]))}</p></div></li>`).join("")}</ol>
+      <div id="lead-slot">${leadHTML()}</div>
+    </div>
+  </div></div>`;
+  document.getElementById("restart").addEventListener("click", () => { state.answers = {}; state.status = "idle"; save(); go(0); });
+  wireLead();
+}
+
+function wireLead() {
+  const f = document.getElementById("f-lead");
+  if (f) {
+    ["first", "email", "phone"].forEach((k) => document.getElementById("l-" + k).addEventListener("input", (e) => { state.lead[k] = e.target.value.trim(); }));
+    document.getElementById("l-ok").addEventListener("change", (e) => { state.lead.ok = e.target.checked; });
+    f.addEventListener("submit", submitLead);
+  }
+  const cs = document.getElementById("copy-sum"); if (cs) cs.addEventListener("click", () => copyText(summaryText(), cs));
+  const cm = document.getElementById("copy-mail"); if (cm) cm.addEventListener("click", () => copyText(CONTACT_EMAIL, cm, document.getElementById("mail-addr")));
+}
+function refreshLead() { document.getElementById("lead-slot").innerHTML = leadHTML(); wireLead(); }
+
+async function submitLead(e) {
+  e.preventDefault();
+  const l = state.lead;
+  if (document.getElementById("l-hp").value) return;
+  if (!l.first || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(l.email) || !l.ok) { state.error = t().leadErr; refreshLead(); return; }
+  state.error = "";
+  if (!FORM_ENDPOINT) { state.status = "mail"; refreshLead(); return; }
+  state.status = "sending"; refreshLead();
+  const { per, total } = scores();
+  const payload = {
+    _subject: t().subject(state.info.name.trim()), first_name: l.first, email: l.email, phone: l.phone,
+    restaurant: state.info.name.trim(), city: state.info.city.trim(), cuisine: cuisine(), language: state.lang,
+    score: total, band: band(total)[1], ...Object.fromEntries(per.map((x) => [x.p.id + "_score", `${x.s}/${x.m}`])),
+    priorities: wins().map((w) => w.q.fix[state.lang][0]).join(" | "), summary: summaryText(), consent: "yes"
+  };
+  try {
+    const r = await fetch(FORM_ENDPOINT, { method: "POST", headers: { "Content-Type": "application/json", Accept: "application/json" }, body: JSON.stringify(payload) });
+    state.status = r.ok ? "sent" : "mail";
+  } catch (err) { state.status = "mail"; }
+  refreshLead();
+}
+
+function copyText(text, btn, sel) {
+  const done = () => { const o = btn.textContent; btn.textContent = t().copied; setTimeout(() => { btn.textContent = o; }, 1600); };
+  const fallback = () => { if (sel) { const r = document.createRange(); r.selectNodeContents(sel); const s = getSelection(); s.removeAllRanges(); s.addRange(r); } };
+  try { navigator.clipboard.writeText(text).then(done, fallback); } catch (e) { fallback(); }
+}
+
+function go(step) { state.step = step; render(); const top = document.querySelector("main"); if (step > 0 && top) top.scrollIntoView({ behavior: "smooth", block: "start" }); }
+function render() {
+  renderChrome();
+  if (state.step === 0) renderIntro();
+  else if (state.step <= 4) renderPillar(state.step - 1);
+  else renderResults();
+}
+document.querySelectorAll(".lang button").forEach((b) => b.addEventListener("click", () => { state.lang = b.dataset.lang; render(); }));
+render();
+</script>
