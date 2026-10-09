@@ -385,6 +385,8 @@ const T = {
   }
 };
 
+let SOURCE = "site";
+try { SOURCE = (new URLSearchParams(location.search).get("src") || "site").slice(0, 40); } catch (e) {}
 const state = { lang: "fr", step: 0, info: { name: "", city: "", cuisine: "" }, answers: {}, lead: { first: "", email: "", phone: "", ok: false }, status: "idle", error: "" };
 state.lang = DEFAULT_LANG === "en" ? "en" : "fr";
 try { const s = JSON.parse(localStorage.getItem("vis-score") || "null"); if (s && s.info) { Object.assign(state.info, s.info); Object.assign(state.answers, s.answers || {}); } } catch (e) {}
@@ -494,6 +496,7 @@ function summaryText() {
   const lines = [
     `${state.info.name.trim()} · ${state.info.city.trim()} · ${cuisine()}`,
     `${t().yourScore}: ${total}/100 (${band(total)[1]})`,
+    `Source: ${SOURCE}`,
     ...per.map((x) => `- ${x.p.name[state.lang]}: ${x.s}/${x.m}`),
     "",
     t().winsTitle + ":",
@@ -569,7 +572,7 @@ async function submitLead(e) {
   const { per, total } = scores();
   const payload = {
     _subject: t().subject(state.info.name.trim()), first_name: l.first, email: l.email, phone: l.phone,
-    restaurant: state.info.name.trim(), city: state.info.city.trim(), cuisine: cuisine(), language: state.lang,
+    restaurant: state.info.name.trim(), city: state.info.city.trim(), cuisine: cuisine(), language: state.lang, source: SOURCE,
     score: total, band: band(total)[1], ...Object.fromEntries(per.map((x) => [x.p.id + "_score", `${x.s}/${x.m}`])),
     priorities: wins().map((w) => w.q.fix[state.lang][0]).join(" | "), summary: summaryText(), consent: "yes"
   };
