@@ -67,6 +67,15 @@ p { max-width: 62ch; }
 .site-header nav { display: flex; gap: 20px; flex-wrap: wrap; }
 .site-header nav a:hover { color: var(--wine); }
 .site-header nav { align-items: center; }
+.nav-cta {
+  margin-left: 6px; padding: 9px 16px; border-radius: 999px; text-decoration: none;
+  background: var(--wine); color: var(--wine-ink) !important; transition: background .2s, transform .2s;
+}
+.nav-cta:hover { background: var(--ink); transform: translateY(-1px); }
+.hero-ctas { display: flex; flex-wrap: wrap; gap: 12px; }
+.btn-solid { background: var(--wine-ink); color: var(--wine); border-color: var(--wine-ink); }
+.hero .btn-solid:hover { background: transparent; color: var(--wine-ink); }
+@media (max-width: 760px) { .site-header nav a[href^="#about"], .site-header nav a[href^="#services"] { display: none; } }
 .lang { display: inline-flex; gap: 4px; padding: 3px; margin-left: 8px; border: 1px solid var(--line); border-radius: 999px; }
 .lang > * { padding: 7px 14px; border-radius: 999px; text-decoration: none; transition: background .2s, color .2s; }
 .lang [aria-current] { background: var(--ink); color: var(--paper); }
