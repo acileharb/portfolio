@@ -389,7 +389,8 @@ let SOURCE = "site";
 try { SOURCE = (new URLSearchParams(location.search).get("src") || "site").slice(0, 40); } catch (e) {}
 const state = { lang: "fr", step: 0, info: { name: "", city: "", cuisine: "" }, answers: {}, lead: { first: "", email: "", phone: "", ok: false }, status: "idle", error: "" };
 state.lang = DEFAULT_LANG === "en" ? "en" : "fr";
-try { const s = JSON.parse(localStorage.getItem("vis-score") || "null"); if (s && s.info) { Object.assign(state.info, s.info); Object.assign(state.answers, s.answers || {}); } } catch (e) {}
+// Every visit starts with a blank test; also clears answers saved by older versions of this page.
+try { localStorage.removeItem("vis-score"); } catch (e) {}
 
 const app = document.getElementById("app");
 const esc = (s) => String(s).replace(/[&<>"']/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]));
@@ -398,7 +399,7 @@ const L = () => state.lang === "fr" ? 0 : 1;
 const cuisine = () => state.info.cuisine.trim() || t().defaultCuisine;
 const fill = (s) => s.replace(/\{cuisine\}/g, esc(cuisine())).replace(/\{city\}/g, esc(state.info.city.trim()));
 const fillPlain = (s) => s.replace(/\{cuisine\}/g, cuisine()).replace(/\{city\}/g, state.info.city.trim());
-function save() { try { localStorage.setItem("vis-score", JSON.stringify({ info: state.info, answers: state.answers })); } catch (e) {} }
+function save() {}
 
 function pts(q) { const i = state.answers[q.id]; return i == null ? 0 : q.o[i][2]; }
 const maxPts = (q) => Math.max(...q.o.map((o) => o[2]));
