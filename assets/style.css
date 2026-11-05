@@ -370,6 +370,9 @@ section.block { padding-block: clamp(56px, 9vw, 120px); border-bottom: 1px solid
 .stats-intro { margin-top: 18px; }
 .stats-intro + .stats { margin-top: 0; }
 .xp-logo { display: block; width: 56px; height: auto; margin-bottom: 12px; }
+.hero-title { display: flex; align-items: center; justify-content: space-between; gap: 24px; }
+.hero-title h1 { min-width: 0; }
+.hero-mark { width: clamp(64px, 9vw, 130px); height: auto; flex: none; }
 .hero-logo { margin: 0; }
 .hero-logo img { width: clamp(120px, 16vw, 190px); height: auto; }
 .note { font-size: 14px; color: var(--ink-soft); }
