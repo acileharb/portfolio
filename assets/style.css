@@ -171,7 +171,7 @@ section.block { padding-block: clamp(56px, 9vw, 120px); border-bottom: 1px solid
 
 /* ===== Project pages ===== */
 .p-hero .wrap { padding-block: clamp(40px, 7vw, 96px) clamp(32px, 5vw, 64px); display: grid; gap: 22px; }
-.p-hero h1 { font-size: clamp(64px, 14vw, 190px); text-transform: uppercase; }
+.p-hero h1 { font-size: clamp(38px, 8.5vw, 132px); text-transform: uppercase; }
 .p-hero .intro { font-size: 19px; max-width: 64ch; margin: 0; }
 .back { text-decoration: none; }
 .back:hover { color: var(--wine); }
@@ -356,6 +356,22 @@ section.block { padding-block: clamp(56px, 9vw, 120px); border-bottom: 1px solid
 .takeaways { list-style: none; margin: 0; padding: 0; display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 1px; background: var(--line); border: 1px solid var(--line); }
 .takeaways li { background: var(--paper); padding: 24px; font: 400 20px/1.3 var(--display); }
 .inline-link { color: var(--wine); text-underline-offset: 4px; white-space: nowrap; }
+.post-cards { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 1px; background: var(--line); border: 1px solid var(--line); }
+.post-card { background: var(--paper); padding: clamp(24px, 3vw, 40px); display: grid; gap: 14px; align-content: start; transition: background .3s, color .3s; }
+.post-card .label { color: var(--wine); }
+.post-card h3 { font-size: clamp(22px, 2.2vw, 28px); line-height: 1.2; }
+.post-card p { margin: 0; color: var(--ink-soft); }
+.post-card:hover { background: var(--wine); color: var(--wine-ink); }
+.post-card:hover .label, .post-card:hover p { color: inherit; }
+@media (max-width: 760px) { .post-cards { grid-template-columns: minmax(0, 1fr); } }
+.case-nav { display: flex; flex-wrap: wrap; justify-content: space-between; align-items: center; gap: 16px; padding-block: 40px; }
+.next-link { text-decoration: none; font: 400 20px/1.2 var(--display); display: inline-flex; gap: 12px; align-items: baseline; }
+.next-link:hover { color: var(--wine); }
+.stats-intro { margin-top: 18px; }
+.stats-intro + .stats { margin-top: 0; }
+.xp-logo { display: block; width: 56px; height: auto; margin-bottom: 12px; }
+.hero-logo { margin: 0; }
+.hero-logo img { width: clamp(120px, 16vw, 190px); height: auto; }
 .note { font-size: 14px; color: var(--ink-soft); }
 .ai-proof { margin: 32px 0 0; display: grid; gap: 12px; max-width: 900px; margin-left: auto; cursor: zoom-in; }
 .ai-proof img { width: 100%; border: 1px solid var(--line); border-radius: 10px; box-shadow: 0 30px 60px -40px rgba(36, 26, 24, .55); background: #fff; }
