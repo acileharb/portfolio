@@ -83,6 +83,8 @@ p { max-width: 62ch; }
   .nav-cta { margin-left: 0; padding: 8px 12px; font-size: 10px; white-space: nowrap; }
   .lang { margin-left: 0; }
   .lang > * { padding: 6px 10px; }
+  .nav-long { display: none; }
+  .site-header .wrap > a { letter-spacing: .1em; }
 }
 .lang { display: inline-flex; gap: 4px; padding: 3px; margin-left: 8px; border: 1px solid var(--line); border-radius: 999px; }
 .lang > * { padding: 7px 14px; border-radius: 999px; text-decoration: none; transition: background .2s, color .2s; }
