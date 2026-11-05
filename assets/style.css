@@ -300,7 +300,7 @@ section.block { padding-block: clamp(56px, 9vw, 120px); border-bottom: 1px solid
   .stat:nth-child(3) { padding-left: 0; border-left: 0; }
   .stat:nth-child(n+3) { border-top: 1px solid var(--line); }
 }
-.cover-type { background: var(--wine); color: var(--wine-ink); display: grid; place-content: center; text-align: center; gap: 6px; }
+.work-item .cover-type { background: var(--wine); color: var(--wine-ink); display: grid; place-content: center; text-align: center; gap: 6px; }
 .cover-type span { font: 400 clamp(64px, 8vw, 110px)/1 var(--display); }
 .cover-type small { font: 500 11px/1 var(--body); letter-spacing: .2em; text-transform: uppercase; opacity: .8; }
 .result-note { font-size: 14px; color: var(--ink-soft); border-top: 1px solid var(--line); padding-top: 12px; }
@@ -312,6 +312,9 @@ section.block { padding-block: clamp(56px, 9vw, 120px); border-bottom: 1px solid
 .btn-dark:hover { background: var(--ink); color: var(--paper); }
 .edu { display: grid; gap: 8px; margin-top: 32px; }
 .edu p { margin: 0; }
+
+.work-item .cover-wide { background: #fff; display: grid; place-items: center; }
+.work-item .cover-wide img { height: auto; object-fit: contain; }
 
 /* Case study pages */
 .case-section { display: grid; grid-template-columns: minmax(0, 4fr) minmax(0, 8fr); gap: clamp(20px, 4vw, 64px); align-items: start; }
