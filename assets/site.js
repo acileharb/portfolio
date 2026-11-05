@@ -18,16 +18,23 @@
 
   /* Hero title: letters rise in */
   document.querySelectorAll('[data-split]').forEach(el => {
-    const text = el.textContent;
+    const text = el.textContent.trim();
     el.setAttribute('aria-label', text);
     el.textContent = '';
-    [...text].forEach((ch, i) => {
-      const s = document.createElement('span');
-      s.className = 'ch';
-      s.setAttribute('aria-hidden', 'true');
-      s.style.setProperty('--i', i);
-      s.textContent = ch === ' ' ? ' ' : ch;
-      el.appendChild(s);
+    let i = 0;
+    text.split(/\s+/).forEach((word, w) => {
+      if (w) el.appendChild(document.createTextNode(' '));
+      const wrap = document.createElement('span');
+      wrap.className = 'word';
+      wrap.setAttribute('aria-hidden', 'true');
+      [...word].forEach(ch => {
+        const s = document.createElement('span');
+        s.className = 'ch';
+        s.style.setProperty('--i', i++);
+        s.textContent = ch;
+        wrap.appendChild(s);
+      });
+      el.appendChild(wrap);
     });
   });
 
