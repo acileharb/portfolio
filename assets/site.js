@@ -96,7 +96,7 @@
   }));
 
   /* Lightbox for feed images & videos */
-  const media = [...document.querySelectorAll('.feed figure')];
+  const media = [...document.querySelectorAll('.feed figure, .post figure')];
   if (media.length) {
     const lb = document.createElement('div');
     lb.className = 'lightbox';
