@@ -76,7 +76,14 @@ p { max-width: 62ch; }
 .hero-ctas { display: flex; flex-wrap: wrap; gap: 12px; }
 .btn-solid { background: var(--wine-ink); color: var(--wine); border-color: var(--wine-ink); }
 .hero .btn-solid:hover { background: transparent; color: var(--wine-ink); }
-@media (max-width: 760px) { .site-header nav a[href^="#about"], .site-header nav a[href^="#services"] { display: none; } }
+@media (max-width: 760px) {
+  .site-header .wrap > a { white-space: nowrap; }
+  .site-header nav { flex-wrap: nowrap; gap: 8px; }
+  .site-header nav > a:not(.nav-cta) { display: none; }
+  .nav-cta { margin-left: 0; padding: 8px 12px; font-size: 10px; white-space: nowrap; }
+  .lang { margin-left: 0; }
+  .lang > * { padding: 6px 10px; }
+}
 .lang { display: inline-flex; gap: 4px; padding: 3px; margin-left: 8px; border: 1px solid var(--line); border-radius: 999px; }
 .lang > * { padding: 7px 14px; border-radius: 999px; text-decoration: none; transition: background .2s, color .2s; }
 .lang [aria-current] { background: var(--ink); color: var(--paper); }
